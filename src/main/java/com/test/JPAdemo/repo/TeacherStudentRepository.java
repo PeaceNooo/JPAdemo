@@ -14,9 +14,10 @@ public interface TeacherStudentRepository extends JpaRepository<TeacherStudent, 
     @Query("SELECT ts.teacher FROM TeacherStudent ts WHERE ts.student.studentId = :studentId")
     List<Teacher> findTeacherByStudentStudentId(Long studentId);
 
-    Optional<TeacherStudent> findByStudent_StudentId(Long studentId);
+    @Query("SELECT ts.student FROM TeacherStudent ts WHERE ts.teacher.teacherId = :teacherId")
+    List<Student> findStudentByTeacherTeacherId(Long teacherId);
 
-//    Optional<TeacherStudent> findByTeacher_TeacherId(Long teacherId);
+    Optional<TeacherStudent> findByStudent_StudentId(Long studentId);
 
     Optional<TeacherStudent> findByStudentAndTeacher(Student student, Teacher teacher);
 

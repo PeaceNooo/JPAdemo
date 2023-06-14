@@ -1,5 +1,6 @@
 package com.test.JPAdemo.service;
 
+import com.test.JPAdemo.dto.StudentDTO;
 import com.test.JPAdemo.dto.TeacherDTO;
 import com.test.JPAdemo.dto.TeacherStudentDTO;
 import com.test.JPAdemo.entity.Student;
@@ -87,6 +88,48 @@ public class TeacherStudentServiceImpl implements TeacherStudentService{
         teacherStudentOptional.ifPresent(teacherStudentRepository::delete);
     }
 
+    @Override
+    public List<StudentDTO> getStudentsByTeacherId(Long teacherId) {
+        // check if teacher exists
+        teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new PeopleNotFoundException("Teacher not found - " + teacherId));
+        List<Student> original = teacherStudentRepository.findStudentByTeacherTeacherId(teacherId);
+
+        return original.stream().map(this::toStudentDTO).toList();
+    }
+
+    @Override
+    public void addStudentToTeacher(Long teacherId, Long studentId) {
+        // Fetch the Student and Teacher entities
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new PeopleNotFoundException("Student not found - " + studentId));
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new PeopleNotFoundException("Teacher not found - " + teacherId));
+
+        // Create a new TeacherStudent entity
+        TeacherStudent teacherStudent = new TeacherStudent();
+        teacherStudent.setStudent(student);
+        teacherStudent.setTeacher(teacher);
+
+        // Save the entity
+        teacherStudentRepository.save(teacherStudent);
+    }
+
+    @Override
+    public void deleteStudentFromTeacher(Long teacherId, Long studentId) {
+        // Fetch the Student and Teacher entities
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new PeopleNotFoundException("Student not found - " + studentId));
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new PeopleNotFoundException("Teacher not found - " + teacherId));
+
+        // Find the TeacherStudent entity for the student and teacher
+        Optional<TeacherStudent> teacherStudentOptional = teacherStudentRepository.findByStudentAndTeacher(student, teacher);
+
+        // If the entity exists, delete it
+        teacherStudentOptional.ifPresent(teacherStudentRepository::delete);
+    }
+
     private TeacherStudentDTO toDTO(TeacherStudent original) {
         TeacherStudentDTO bean = new TeacherStudentDTO();
         BeanUtils.copyProperties(original, bean);
@@ -96,6 +139,12 @@ public class TeacherStudentServiceImpl implements TeacherStudentService{
     private TeacherDTO toTeacherDTO(Teacher teacher) {
         TeacherDTO dto = new TeacherDTO();
         BeanUtils.copyProperties(teacher, dto);
+        return dto;
+    }
+
+    private StudentDTO toStudentDTO(Student student) {
+        StudentDTO dto = new StudentDTO();
+        BeanUtils.copyProperties(student, dto);
         return dto;
     }
 
