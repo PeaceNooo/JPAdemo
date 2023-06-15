@@ -3,9 +3,11 @@ package com.test.JPAdemo.entity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.List;
  */
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "student")
 public class Student {
 

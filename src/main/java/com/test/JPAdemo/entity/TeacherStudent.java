@@ -1,13 +1,17 @@
 package com.test.JPAdemo.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * $table.getTableComment()
  */
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "teacher_student")
 public class TeacherStudent {
 

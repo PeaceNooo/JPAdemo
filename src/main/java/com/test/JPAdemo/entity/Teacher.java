@@ -1,8 +1,10 @@
 package com.test.JPAdemo.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -11,6 +13,8 @@ import java.util.List;
  */
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "teacher")
 public class Teacher {
 
