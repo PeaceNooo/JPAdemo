@@ -4,12 +4,16 @@ import com.test.JPAdemo.dto.StudentDTO;
 import com.test.JPAdemo.dto.TeacherDTO;
 import com.test.JPAdemo.service.TeacherService;
 import com.test.JPAdemo.service.TeacherStudentService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import java.net.URI;
 import java.util.List;
 
 @Validated
@@ -29,55 +33,63 @@ public class TeacherController {
 
     // Create a new teacher
     @PostMapping
-    public String save(@Valid @RequestBody TeacherDTO dto) {
-        return teacherService.save(dto).toString();
+    public ResponseEntity<Void> save(@Valid @RequestBody TeacherDTO dto) {
+        long id = teacherService.save(dto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(id).toUri();
+
+        return ResponseEntity.created(location).build();
     }
 
     // Delete a teacher by id
     @DeleteMapping("/{id}")
-    public String delete(@Valid @NotNull @PathVariable("id") Long id) {
-
-        return teacherService.delete(id);
+    public ResponseEntity<Void> delete(@Valid @NotNull @PathVariable("id") Long id) {
+        teacherService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     // Update a teacher by id
     @PutMapping("/{id}")
-    public TeacherDTO update(@Valid @NotNull @PathVariable("id") Long id,
-                       @Valid @RequestBody TeacherDTO dto) {
-        return teacherService.update(id, dto);
+    public ResponseEntity<TeacherDTO> update(@Valid @NotNull @PathVariable("id") Long id,
+                                             @Valid @RequestBody TeacherDTO dto) {
+        TeacherDTO updatedTeacher = teacherService.update(id, dto);
+        return ResponseEntity.ok(updatedTeacher);
     }
 
     // Get a teacher by id
     @GetMapping("/{id}")
-    public TeacherDTO getById(@Valid @NotNull @PathVariable("id") Long id) {
-        return teacherService.getById(id);
+    public ResponseEntity<TeacherDTO> getById(@Valid @NotNull @PathVariable("id") Long id) {
+        TeacherDTO teacher = teacherService.getById(id);
+        return ResponseEntity.ok(teacher);
     }
 
     // Get all teachers
     @GetMapping
-    public List<TeacherDTO> findAll() {
-        return teacherService.findAll();
+    public ResponseEntity<List<TeacherDTO>> findAll() {
+        List<TeacherDTO> teachers = teacherService.findAll();
+        return ResponseEntity.ok(teachers);
     }
 
     // Get all students for a teacher
     @GetMapping("/{teacherId}/students")
-    public List<StudentDTO> getStudentsByTeacherId(@PathVariable Long teacherId) {
-        return teacherStudentService.getStudentsByTeacherId(teacherId);
+    public ResponseEntity<List<StudentDTO>> getStudentsByTeacherId(@PathVariable Long teacherId) {
+        List<StudentDTO> students = teacherStudentService.getStudentsByTeacherId(teacherId);
+        return ResponseEntity.ok(students);
     }
 
 
     // Add a new student to a teacher
     @PostMapping("/{teacherId}/students/{studentId}")
-    public String addStudentToTeacher(@PathVariable Long teacherId, @PathVariable Long studentId) {
+    public ResponseEntity<String> addStudentToTeacher(@PathVariable Long teacherId, @PathVariable Long studentId) {
         teacherStudentService.addStudentToTeacher(teacherId, studentId);
-        return "Student with id " + studentId + " was added to teacher with id " + teacherId;
+        return ResponseEntity.ok("Student with id " + studentId + " was added to teacher with id " + teacherId);
     }
 
     // Delete a student from a teacher
     @DeleteMapping("/{teacherId}/students/{studentId}")
-    public String deleteStudentFromTeacher(@PathVariable Long teacherId, @PathVariable Long studentId) {
+    public ResponseEntity<Void> deleteStudentFromTeacher(@PathVariable Long teacherId, @PathVariable Long studentId) {
         teacherStudentService.deleteStudentFromTeacher(teacherId, studentId);
-        return "Student with id " + studentId + " was deleted from teacher with id " + teacherId;
+        return ResponseEntity.noContent().build();
 
     }
 
